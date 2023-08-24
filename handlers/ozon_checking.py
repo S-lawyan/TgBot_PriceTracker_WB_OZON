@@ -4,20 +4,20 @@ from bot.create_bot import db, selen, bot, scheduler
 import random
 
 
-# async def stopwatch(funk):
-#     async def wrapper(*args, **kwargs):
-#         start_time = datetime.now().timestamp()
-#         await funk(*args, **kwargs)
-#         await bot.send_message(
-#             chat_id=514665692,
-#            text=f"Время выполнения проверки цен OZON - {datetime.now().timestamp() - start_time}"
-#         )
-#         logging.error(f"Время выполнения проверки цен OZON --- {datetime.now().timestamp() - start_time}")
-#         return
-#     return wrapper
+def stopwatch(funk):
+    async def wrapper(*args, **kwargs):
+        start_time = datetime.now().timestamp()
+        await funk(*args, **kwargs)
+        await bot.send_message(
+            chat_id=514665692,
+           text=f"Время выполнения проверки цен OZON - {datetime.now().timestamp() - start_time}"
+        )
+        logging.error(f"Время выполнения проверки цен OZON --- {datetime.now().timestamp() - start_time}")
+        return
+    return wrapper
 
 
-# @stopwatch
+@stopwatch
 async def ozon_price_checking() -> None:
     '''
     Функция, проверяющая разницу цен товара. Запускается в интервале времени.
