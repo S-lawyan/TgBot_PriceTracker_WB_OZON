@@ -1,5 +1,5 @@
 from aiogram import types, Dispatcher
-from bot.create_bot import dp, bot, PASSWORD, db, selen, selen
+from bot.create_bot import dp, bot, PASSWORD, db, selen
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
@@ -127,7 +127,8 @@ async def processing_arcicul(message: types.Message, state: FSMContext):
                 data['sent_message'] = sent_message
             await ClientStates.await_react.set()
 
-@dp.callback_query_handler(text_contains="#", state=ClientStates.which_store) # text=['wb, ozon']
+
+@dp.callback_query_handler(text_contains="#", state=ClientStates.which_store)  # text=['wb, ozon']
 async def enter_source(call: types.CallbackQuery, state: FSMContext):
     # Удаление сообщения с кнопками выбора источника
     async with state.proxy() as data:
@@ -167,13 +168,14 @@ async def enter_source(call: types.CallbackQuery, state: FSMContext):
             await sent_message.delete()
             price = "Нет в наличии" if result['price'] == False else str(result['price']) + ' ₽'
             sent_message = await call.message.answer_photo(photo=result['img'],
-                                                      caption=f"{source_}\n<b>Артикул:</b> {result['articul']}\n<b>Название:</b> {result['name']}\n<b>Цена:</b> {price}",
-                                                      reply_markup=kb_react)
+                                                           caption=f"{source_}\n<b>Артикул:</b> {result['articul']}\n<b>Название:</b> {result['name']}\n<b>Цена:</b> {price}",
+                                                           reply_markup=kb_react)
         async with state.proxy() as data:
             data['result'] = result
             data['sent_message'] = sent_message
             data['source'] = source
         await ClientStates.await_react.set()
+
 
 @dp.callback_query_handler(text=['add_position'], state=ClientStates.await_react)
 async def add_position(call: types.CallbackQuery, state: FSMContext):
@@ -257,11 +259,11 @@ async def my_positions(message: types.Message, state: FSMContext):
 @dp.message_handler(commands=['dell_position'])
 @dp.message_handler(Text(equals='удалить позицию(и)', ignore_case=True))
 async def delete_position(message: types.Message, state: FSMContext):
-
     sent_message = await message.answer("Выберите источник", reply_markup=await enter_source_kb(articul=''))
     async with state.proxy() as data:
         data['sent_message'] = sent_message
     await ClientStates.get_source.set()
+
 
 # @dp.message_handler(content_types=types.ContentType.TEXT, state=ClientStates.get_source)
 @dp.callback_query_handler(text_contains="#", state=ClientStates.get_source)
@@ -278,6 +280,7 @@ async def get_source_for_delete(call: types.CallbackQuery, state: FSMContext):
         data['sent_message'] = sent_message
         data['source'] = source_
     await ClientStates.get_position_list.set()
+
 
 # @dp.message_handler(content_types=types.ContentType.TEXT, state=ClientStates.get_position_list)
 async def processing_delete(message: types.Message, state: FSMContext):
@@ -301,7 +304,8 @@ async def processing_delete(message: types.Message, state: FSMContext):
         for articul in articul_list:
             flag = await db.check_position(articul, user_id=message.from_user.id, source=source)
             if flag == False:
-                await message.answer(f"⚠️Такой позиции нет в отслеживаемых (возможно только в указанном магазине): {articul}")
+                await message.answer(
+                    f"⚠️Такой позиции нет в отслеживаемых (возможно только в указанном магазине): {articul}")
                 continue
                 # async with state.proxy() as data:
                 #     data['sent_message'] = sent_message

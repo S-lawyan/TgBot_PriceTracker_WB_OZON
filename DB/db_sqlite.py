@@ -1,5 +1,6 @@
 import sqlite3 as sq
 
+
 class DataBase():
 
     def __init__(self):
@@ -8,8 +9,6 @@ class DataBase():
         if self.connect:
             print('Data base connected OK!')
             self.create_scheme()
-
-
 
     def create_scheme(self):
         ''' Создание схемы таблиц в БД '''
@@ -56,28 +55,31 @@ class DataBase():
 
     async def save_position(self, articul, name, price, date_time, user_id, img, source):
         with self.connect as connect:
-            connect.execute(f"INSERT INTO positions (articul, name, price, img, user_id, date_time, source) VALUES (?, ?, ?, ?, ?, ?, ?)", (articul, name, price, img, user_id, date_time, source))
+            connect.execute(
+                f"INSERT INTO positions (articul, name, price, img, user_id, date_time, source) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (articul, name, price, img, user_id, date_time, source))
             connect.commit()
 
     async def check_position(self, articul, user_id, source):
         with self.connect as connect:
-            result = bool(connect.execute(f""" SELECT articul FROM positions WHERE articul = {articul} AND user_id = {user_id} AND source = '{source}'""").fetchone())
+            result = bool(connect.execute(
+                f""" SELECT articul FROM positions WHERE articul = {articul} AND user_id = {user_id} AND source = '{source}'""").fetchone())
         return result
 
     async def get_all_position(self, user_id, source):
         with self.connect as connect:
-            result = connect.execute(f""" SELECT * FROM positions WHERE user_id = {user_id} AND source = '{source}' """).fetchall()
+            result = connect.execute(
+                f""" SELECT * FROM positions WHERE user_id = {user_id} AND source = '{source}' """).fetchall()
         return result
 
     async def dell_position(self, articul, user_id, source):
         with self.connect as connect:
-            connect.execute(f"""DELETE FROM positions WHERE articul = {articul} AND user_id = {user_id} AND source = '{source}'""")
+            connect.execute(
+                f"""DELETE FROM positions WHERE articul = {articul} AND user_id = {user_id} AND source = '{source}'""")
             connect.commit()
 
     async def update_price(self, articul, user_id, price, source):
         with self.connect as connect:
-            connect.execute(f"""UPDATE positions SET price = '{price}' WHERE articul = {articul} AND user_id = {user_id} AND source = '{source}'""")
+            connect.execute(
+                f"""UPDATE positions SET price = '{price}' WHERE articul = {articul} AND user_id = {user_id} AND source = '{source}'""")
             connect.commit()
-
-
-

@@ -61,7 +61,8 @@ async def wb_price_checking() -> None:
 
             else:
                 logging.error(f"При проверке цены возникла проблема при обработке с артикулом {articul}")
-                await bot.send_message(user_id, f"⚠ С артикулом {articul} (WB) возникли проблемы. Проверьте наличие товара.")
+                await bot.send_message(user_id,
+                                       f"⚠ С артикулом {articul} (WB) возникли проблемы. Проверьте наличие товара.")
                 continue
     if articul is not None:
         logging.error(f"Время выполнения проверки цен WB --- {datetime.now().timestamp() - start_time}")
@@ -76,6 +77,8 @@ async def wb_add_price_checking_job():
     '''
     scheduler.add_job(wb_price_checking, trigger='interval', seconds=random.randint(1, 5), id='wb_price_checking')
 
-scheduler.add_job(wb_add_price_checking_job, trigger='date', run_date=datetime.now() + timedelta(seconds=5), id='wb_price_checking')
+
+scheduler.add_job(wb_add_price_checking_job, trigger='date', run_date=datetime.now() + timedelta(seconds=5),
+                  id='wb_price_checking')
 
 __all__ = ['wb_price_checking']

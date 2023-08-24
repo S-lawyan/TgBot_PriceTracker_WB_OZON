@@ -128,7 +128,8 @@ class Selen():
             try:
                 error_404 = WebDriverWait(DRIVER, 20).until(
                     EC.presence_of_element_located((By.XPATH, '//div[@data-widget="error"]')))
-                logging.error(f"OZON: Ошибка при ожидании (stickyContainer) артикула {articul}. Он отсутствует на сайте.")
+                logging.error(
+                    f"OZON: Ошибка при ожидании (stickyContainer) артикула {articul}. Он отсутствует на сайте.")
                 DRIVER.delete_all_cookies()
                 return None
             except:
