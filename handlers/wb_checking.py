@@ -4,6 +4,20 @@ from bot.create_bot import db, selen, bot, scheduler
 import random
 
 
+def stopwatch(funk):
+    async def wrapper(*args, **kwargs):
+        start_time = datetime.now().timestamp()
+        await funk(*args, **kwargs)
+        await bot.send_message(
+            chat_id=514665692,
+           text=f"Время выполнения проверки цен WB - {datetime.now().timestamp() - start_time}"
+        )
+        logging.error(f"Время выполнения проверки цен WB --- {datetime.now().timestamp() - start_time}")
+        return
+    return wrapper
+
+
+@stopwatch
 async def wb_price_checking() -> None:
     '''
     Функция, проверяющая разницу цен товара. Запускается в интервале времени.
@@ -64,10 +78,7 @@ async def wb_price_checking() -> None:
                 await bot.send_message(user_id,
                                        f"⚠ С артикулом {articul} (WB) возникли проблемы. Проверьте наличие товара.")
                 continue
-    if articul is not None:
-        logging.error(f"Время выполнения проверки цен WB --- {datetime.now().timestamp() - start_time}")
-        await bot.send_message(chat_id=514665692,
-                               text=f"Время выполнения проверки цен WB - {datetime.now().timestamp() - start_time}")
+
     await wb_add_price_checking_job()
 
 
@@ -75,10 +86,13 @@ async def wb_add_price_checking_job():
     '''
     Запуск проверки цен каждый 30 минут (в плане - 60 минут)
     '''
-    scheduler.add_job(wb_price_checking, trigger='interval', seconds=random.randint(1, 5), id='wb_price_checking')
+    scheduler.add_job(wb_price_checking, trigger='interval', minutes=random.randint(1, 5), id='wb_price_checking')
 
 
-scheduler.add_job(wb_add_price_checking_job, trigger='date', run_date=datetime.now() + timedelta(seconds=5),
-                  id='wb_price_checking')
+scheduler.add_job(
+    wb_add_price_checking_job,
+    trigger='date', run_date=datetime.now() + timedelta(seconds=10),
+    id='wb_price_checking'
+)
 
 __all__ = ['wb_price_checking']

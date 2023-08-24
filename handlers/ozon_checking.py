@@ -27,8 +27,8 @@ async def ozon_price_checking() -> None:
     users_list = await db.get_all_users()
     if len(users_list) == 0:
         return
-    start_time = datetime.now().timestamp()
-    articul = None
+    # start_time = datetime.now().timestamp()
+    # articul = None
     for user_id in users_list:
         positions_list = await db.get_all_position(user_id=user_id, source='ozon')
         if len(positions_list) == 0:
@@ -80,11 +80,6 @@ async def ozon_price_checking() -> None:
                                        f"⚠ С артикулом {articul} (OZON) возникли проблемы. Проверьте наличие товара.")
                 continue
 
-    if articul is not None:
-        logging.error(f"Время выполнения проверки цен WB --- {datetime.now().timestamp() - start_time}")
-        await bot.send_message(chat_id=514665692,
-                               text=f"Время выполнения проверки цен WB - {datetime.now().timestamp() - start_time}")
-
     await ozon_add_price_checking_job()
 
 
@@ -92,10 +87,14 @@ async def ozon_add_price_checking_job():
     '''
     Запуск проверки цен каждый 30 минут (в плане - 60 минут)
     '''
-    scheduler.add_job(ozon_price_checking, trigger='interval', seconds=random.randint(1, 5), id='ozon_price_checking')
+    scheduler.add_job(ozon_price_checking, trigger='interval', minutes=random.randint(1, 5), id='ozon_price_checking')
 
 
-scheduler.add_job(ozon_add_price_checking_job, trigger='date', run_date=datetime.now() + timedelta(seconds=5),
-                  id='ozon_price_checking')
+scheduler.add_job(
+    ozon_add_price_checking_job,
+    trigger='date',
+    run_date=datetime.now() + timedelta(seconds=15),
+    id='ozon_price_checking'
+)
 
 __all__ = ['ozon_price_checking']
