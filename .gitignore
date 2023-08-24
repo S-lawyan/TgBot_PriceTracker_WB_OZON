@@ -1,0 +1,4 @@
+.idea
+venv
+src/config.ini
+DB/bot_database.db
