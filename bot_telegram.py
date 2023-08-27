@@ -1,6 +1,6 @@
 from aiogram.utils import executor
 from bot.create_bot import dp
-
+from handlers import client
 
 async def on_startup(_):
     print('Бот вышел в онлайн.')
@@ -8,9 +8,6 @@ async def on_startup(_):
 
 async def on_shutdown(_):
     print('Бот прекратил работу.')
-
-
-from handlers import client
 
 client.register_handlers_client(dp)
 
