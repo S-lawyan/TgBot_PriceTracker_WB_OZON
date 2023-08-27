@@ -76,7 +76,7 @@ async def wb_price_checking() -> None:
             else:
                 logging.error(f"При проверке цены возникла проблема при обработке с артикулом {articul}")
                 await bot.send_message(user_id,
-                                       f"⚠ С артикулом {articul} (WB) возникли проблемы. Проверьте наличие товара.")
+                                       f"⚠️ С артикулом {articul} (WB) возникли проблемы. Проверьте наличие товара.")
                 continue
 
     await wb_add_price_checking_job()

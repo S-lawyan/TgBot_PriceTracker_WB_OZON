@@ -275,6 +275,12 @@ async def get_source_for_delete(call: types.CallbackQuery, state: FSMContext):
 
     await sent_message.edit_reply_markup(reply_markup=None)
     await sent_message.edit_text(f"Источник: {source}")
+    position_list = await db.get_all_position(user_id=call.from_user.id, source=source_)
+    if len(position_list) == 0:
+        await call.message.answer("⚠️ У вас нет отслеживаемых позиций в этом источнике")
+        await state.finish()
+        return
+
     sent_message = await call.message.answer(f"Укажите один или несколько артикулов {source}", reply_markup=kb_cancel)
     async with state.proxy() as data:
         data['sent_message'] = sent_message
