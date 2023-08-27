@@ -160,13 +160,13 @@ class Selen():
             By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]')))
         # получаю высоту страницы
         page_height = DRIVER.execute_script("return document.body.scrollHeight")
+        BODY = await asyncio.create_task(self.wait_fing_element(DRIVER, 20, (By.XPATH, "//body")))
+        actions = self.actions_list.get('ozon')
+        actions.move_to_element(BODY).perform()
         for _ in range(3):  # Выполняем 3 случайных скролла
             # Генерируем случайную позицию для скролла
             scroll_position = random.randint(0, page_height)
             # Выполняем скролл
-            BODY = await asyncio.create_task(self.wait_fing_element(DRIVER, 20, (By.XPATH, "//body")))
-            actions = self.actions_list.get('ozon')
-            actions.move_to_element(BODY).perform()
             DRIVER.execute_script(f"window.scrollTo(0, {scroll_position});")
             # Задержка перед следующим действием
             await asyncio.sleep(random.uniform(2, 4))
@@ -236,13 +236,13 @@ class Selen():
             self.wait_fing_element(DRIVER, 20, (By.XPATH, "//div[@class='product-page__header']")))
         # получаю высоту страницы
         page_height = DRIVER.execute_script("return document.body.scrollHeight")
+        BODY = await asyncio.create_task(self.wait_fing_element(DRIVER, 20, (By.XPATH, "//body")))
+        actions = self.actions_list.get('wb')
+        actions.move_to_element(BODY).perform()
         for _ in range(3):  # Выполняем 3 случайных скролла
             # Генерируем случайную позицию для скролла
             scroll_position = random.randint(0, page_height)
             # Выполняем скролл
-            BODY = await asyncio.create_task(self.wait_fing_element(DRIVER, 20, (By.XPATH, "//body")))
-            actions = self.actions_list.get('wb')
-            actions.move_to_element(BODY).perform()
             DRIVER.execute_script(f"window.scrollTo(0, {scroll_position});")
             # Задержка перед следующим действием
             await asyncio.sleep(random.uniform(2, 4))

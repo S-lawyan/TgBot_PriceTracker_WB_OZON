@@ -93,7 +93,7 @@ async def ozon_add_price_checking_job():
 scheduler.add_job(
     ozon_add_price_checking_job,
     trigger='date',
-    run_date=datetime.now() + timedelta(seconds=15),
+    run_date=datetime.now() + timedelta(seconds=10),
     id='ozon_price_checking'
 )
 

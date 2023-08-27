@@ -91,7 +91,8 @@ async def wb_add_price_checking_job():
 
 scheduler.add_job(
     wb_add_price_checking_job,
-    trigger='date', run_date=datetime.now() + timedelta(seconds=10),
+    trigger='date',
+    run_date=datetime.now() + timedelta(seconds=15),
     id='wb_price_checking'
 )
 
