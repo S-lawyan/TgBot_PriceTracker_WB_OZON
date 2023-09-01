@@ -99,3 +99,8 @@ class DataBase:
                 f"""UPDATE positions SET price = '{price}' WHERE articul = {articul} AND user_id = {user_id} AND source = '{source}'"""
             )
             connect.commit()
+
+    async def reset_db(self):
+        with self.connect as connect:
+            connect.execute(f""" UPDATE positions SET price = 777 """)
+            connect.commit()

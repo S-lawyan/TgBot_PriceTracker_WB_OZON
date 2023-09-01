@@ -37,6 +37,7 @@ async def ozon_price_checking() -> None:
         if len(users_list) == 0:
             return
         for user_id in users_list:
+            counter = 0
             positions_list = await db.get_all_position(user_id=user_id, source="ozon")
             if len(positions_list) == 0:
                 continue
@@ -54,7 +55,11 @@ async def ozon_price_checking() -> None:
                 price_new = await selen.ozon_check_price(articul)
 
                 if price_new is not None:
+                    counter += 1
                     if price_old == False and price_new != False:
+                        logging.error(
+                            f"ИЗМЕНЕНИЕ СТАТУСА ТОВАРА {articul} --- Товар появился в наличии"
+                        )
                         await bot.send_photo(
                             user_id,
                             photo=img,
@@ -68,6 +73,9 @@ async def ozon_price_checking() -> None:
                         )
 
                     elif price_old != False and price_new == False:
+                        logging.error(
+                            f"ИЗМЕНЕНИЕ СТАТУСА ТОВАРА {articul} --- Товара больше нет в наличии"
+                        )
                         await bot.send_photo(
                             user_id,
                             photo=img,
@@ -82,6 +90,9 @@ async def ozon_price_checking() -> None:
                         )
 
                     elif price_new < price_old:
+                        logging.error(
+                            f"ИЗМЕНЕНИЕ СТАТУСА ТОВАРА {articul} --- Цена снижена с {price_old} на {price_new}"
+                        )
                         difference = price_old - price_new
                         await bot.send_photo(
                             user_id,
@@ -96,6 +107,9 @@ async def ozon_price_checking() -> None:
                         )
 
                     elif price_new > price_old:
+                        logging.error(
+                            f"ИЗМЕНЕНИЕ СТАТУСА ТОВАРА {articul} --- Цена возросла с {price_old} на {price_new}"
+                        )
                         difference = price_new - price_old
                         await bot.send_photo(
                             user_id,
@@ -117,10 +131,15 @@ async def ozon_price_checking() -> None:
                         f"При проверке цены возникла проблема при обработке с артикулом {articul}"
                     )
                     await bot.send_message(
-                        user_id,
-                        f"⚠️ С артикулом {articul} (OZON) возникли проблемы. Проверьте наличие товара.",
+                        514665692,
+                        f"⚠️ Товар с артикулом {articul} (OZON) исчез с сайта. Проверьте его валидность.",
                     )
                     continue
+
+            await bot.send_message(
+                514665692,
+                f"Для пользователя {user_id} проверено {counter} позиций OZON",
+            )
 
         await ozon_add_price_checking_job()
 
@@ -141,7 +160,7 @@ async def ozon_add_price_checking_job():
     scheduler.add_job(
         ozon_price_checking,
         trigger="interval",
-        minutes=random.randint(1, 5),
+        seconds=random.randint(1, 5),
         id="ozon_price_checking",
     )
 
@@ -149,7 +168,7 @@ async def ozon_add_price_checking_job():
 scheduler.add_job(
     ozon_add_price_checking_job,
     trigger="date",
-    run_date=datetime.now() + timedelta(seconds=10),
+    run_date=datetime.now() + timedelta(seconds=5),
     id="ozon_price_checking",
 )
 

@@ -59,11 +59,11 @@ class Selen:
             DRIVER = webdriver.Chrome(options=options, service=self.service)
             self.drivers_list[user_id] = DRIVER
 
-        url = f"https://www.ozon.ru/product/{articul}"
+        url = f"https://www.ozon.ru/product/{articul}/?oos_search=false"
         product = {}
         try:
             DRIVER.get(url)
-            await asyncio.sleep(random.randint(1, 3))
+            # await asyncio.sleep(random.randint(1, 3))
         except Exception as e:
             logging.error(f"OZON: Исключение при открытии страницы: {e} --- {url}")
             return None
@@ -76,13 +76,23 @@ class Selen:
                 )
             )
         except:
-            error_404 = await asyncio.create_task(
-                self.wait_fing_element(
-                    DRIVER, 20, (By.CSS_SELECTOR, 'div[data-widget="webOutOfStock"]')
+            try:
+                error_404 = WebDriverWait(DRIVER, 20).until(
+                    EC.presence_of_element_located(
+                        (By.XPATH, '//div[@data-widget="error"]')
+                    )
                 )
-            )
-            await self.clear_driver(DRIVER=DRIVER)
-            return None
+                logging.error(
+                    f"OZON: Ошибка при ожидании (stickyContainer) артикула {articul}. Он отсутствует на сайте."
+                )
+                await self.clear_driver(DRIVER=DRIVER)
+                return None
+            except:
+                logging.error(
+                    f"ЧТО-ТО СТРАННОЕ OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
+                )
+                await self.clear_driver(DRIVER=DRIVER)
+                return None
 
         # НАИМЕНОВАНИЕ ТОВАРА
         name_element = DRIVER.find_element(
@@ -103,6 +113,11 @@ class Selen:
 
         try:
             price_element = DRIVER.find_element(
+                By.CSS_SELECTOR, 'div[data-widget="webOutOfStock"]'
+            )
+            price_card = False
+        except:
+            price_element = DRIVER.find_element(
                 By.CSS_SELECTOR, 'div[data-widget="webPrice"]'
             )
             price = str(price_element.text)
@@ -110,8 +125,6 @@ class Selen:
             price = re.findall(r"\d+[^\S\n]*\d*", price)
             price = [re.sub(r"[^\S\n]", "", num) for num in price]
             price_card = price[0]
-        except:
-            price_card = False
 
         product["price"] = price_card
         await self.clear_driver(DRIVER=DRIVER)
@@ -123,10 +136,10 @@ class Selen:
         :return:
         """
         DRIVER = self.drivers_list.get("ozon")
-        url = f"https://www.ozon.ru/product/{articul}"
+        url = f"https://www.ozon.ru/product/{articul}/?oos_search=false"
         try:
             DRIVER.get(url)
-            await asyncio.sleep(random.randint(1, 3))
+            # await asyncio.sleep(random.randint(1, 3))
         except Exception as e:
             logging.error(f"OZON: Исключение при открытии страницы: {e} --- {url}")
             return None
@@ -139,9 +152,6 @@ class Selen:
                 )
             )
         except:
-            logging.error(
-                f"OZON: Ошибка при ожидании (stickyContainer) артикула {articul}"
-            )
             try:
                 error_404 = WebDriverWait(DRIVER, 20).until(
                     EC.presence_of_element_located(
@@ -155,7 +165,7 @@ class Selen:
                 return None
             except:
                 logging.error(
-                    f"OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
+                    f"ЧТО-ТО СТРАННОЕ OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
                 )
                 DRIVER.delete_all_cookies()
                 return None
@@ -166,6 +176,12 @@ class Selen:
         # ОБРАБОТКА ЦЕННИКА
         try:
             price_element = DRIVER.find_element(
+                By.CSS_SELECTOR, 'div[data-widget="webOutOfStock"]'
+            )
+            DRIVER.delete_all_cookies()
+            return False
+        except:
+            price_element = DRIVER.find_element(
                 By.CSS_SELECTOR, 'div[data-widget="webPrice"]'
             )
             price = str(price_element.text)
@@ -175,9 +191,20 @@ class Selen:
             price_card = price[0]
             DRIVER.delete_all_cookies()
             return int(price_card)
-        except:
-            DRIVER.delete_all_cookies()
-            return False
+        # try:
+        #     price_element = DRIVER.find_element(
+        #         By.CSS_SELECTOR, 'div[data-widget="webPrice"]'
+        #     )
+        #     price = str(price_element.text)
+        #     price = re.sub(r"[^a-zA-Zа-яА-Я0-9\s]+", "", price)
+        #     price = re.findall(r"\d+[^\S\n]*\d*", price)
+        #     price = [re.sub(r"[^\S\n]", "", num) for num in price]
+        #     price_card = price[0]
+        #     DRIVER.delete_all_cookies()
+        #     return int(price_card)
+        # except:
+        #     DRIVER.delete_all_cookies()
+        #     return False
 
     async def ozon_masking(self, DRIVER):
         # жду пока прогрузится контент

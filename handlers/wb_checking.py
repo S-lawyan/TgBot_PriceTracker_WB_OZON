@@ -37,6 +37,7 @@ async def wb_price_checking() -> None:
         if len(users_list) == 0:
             return
         for user_id in users_list:
+            counter = 0
             positions_list = await db.get_all_position(user_id=user_id, source="wb")
             if len(positions_list) == 0:
                 continue
@@ -53,7 +54,11 @@ async def wb_price_checking() -> None:
                 # Получение новых данных
                 price_new = await selen.wb_check_price(articul)
                 if price_new is not None:
+                    counter += 1
                     if price_old == False and price_new != False:
+                        logging.error(
+                            f"ИЗМЕНЕНИЕ СТАТУСА ТОВАРА {articul} --- Товар появился в наличии"
+                        )
                         await bot.send_photo(
                             user_id,
                             photo=img,
@@ -67,6 +72,9 @@ async def wb_price_checking() -> None:
                         )
 
                     elif price_old != False and price_new == False:
+                        logging.error(
+                            f"ИЗМЕНЕНИЕ СТАТУСА ТОВАРА {articul} --- Товара больше нет в наличии"
+                        )
                         await bot.send_photo(
                             user_id,
                             photo=img,
@@ -81,6 +89,9 @@ async def wb_price_checking() -> None:
                         )
 
                     elif price_new < price_old:
+                        logging.error(
+                            f"ИЗМЕНЕНИЕ СТАТУСА ТОВАРА {articul} --- Цена снижена с {price_old} на {price_new}"
+                        )
                         difference = price_old - price_new
                         await bot.send_photo(
                             user_id,
@@ -95,6 +106,9 @@ async def wb_price_checking() -> None:
                         )
 
                     elif price_new > price_old:
+                        logging.error(
+                            f"ИЗМЕНЕНИЕ СТАТУСА ТОВАРА {articul} --- Цена возросла с {price_old} на {price_new}"
+                        )
                         difference = price_new - price_old
                         await bot.send_photo(
                             user_id,
@@ -116,10 +130,15 @@ async def wb_price_checking() -> None:
                         f"При проверке цены возникла проблема при обработке с артикулом {articul}"
                     )
                     await bot.send_message(
-                        user_id,
-                        f"⚠️ С артикулом {articul} (WB) возникли проблемы. Проверьте наличие товара.",
+                        514665692,
+                        f"⚠️ Товар с артикулом {articul} (WB) исчез с сайта. Проверьте его валидность.",
                     )
                     continue
+
+            await bot.send_message(
+                514665692,
+                f"Для пользователя {user_id} проверено {counter} позиций WB",
+            )
 
         await wb_add_price_checking_job()
 
@@ -140,7 +159,7 @@ async def wb_add_price_checking_job():
     scheduler.add_job(
         wb_price_checking,
         trigger="interval",
-        minutes=random.randint(1, 5),
+        seconds=random.randint(1, 5),
         id="wb_price_checking",
     )
 
@@ -148,7 +167,7 @@ async def wb_add_price_checking_job():
 scheduler.add_job(
     wb_add_price_checking_job,
     trigger="date",
-    run_date=datetime.now() + timedelta(seconds=15),
+    run_date=datetime.now() + timedelta(seconds=5),
     id="wb_price_checking",
 )
 

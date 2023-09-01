@@ -42,6 +42,12 @@ async def command_start(message: types.Message, state: FSMContext):
         )
 
 
+@dp.message_handler(commands=["/reset"])
+async def reset_db(message: types.Message, state: FSMContext):
+    await db.reset_db()
+    await message.answer("Все цены приравнены к 777!")
+
+
 @dp.callback_query_handler(text=["password"], state=None)
 async def click_password(call: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
