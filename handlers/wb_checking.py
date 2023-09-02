@@ -113,7 +113,7 @@ async def wb_price_checking() -> None:
                         await bot.send_photo(
                             user_id,
                             photo=img,
-                            caption=f'⚡ Цена возросла\nWildberries 🟣\n<b>{name}</b>\nАртикул: <b>{articul}</b>\nСтарая цена: <b>{price_old}</b> ₽\nНовая цена: <b>{price_new}</b> ₽\n<a href="https://www.wildberries.ru/catalog/{articul}/detail.aspx">ССЫЛКА</a>\n\n<b>Подорожало на: {difference} ₽</b>',
+                            caption=f'⚡ <b>Цена возросла</b>\nWildberries 🟣\n<b>{name}</b>\nАртикул: <b>{articul}</b>\nСтарая цена: <b>{price_old}</b> ₽\nНовая цена: <b>{price_new}</b> ₽\n<a href="https://www.wildberries.ru/catalog/{articul}/detail.aspx">ССЫЛКА</a>\n\n<b>Подорожало на: {difference} ₽</b>',
                         )
                         await db.update_price(
                             articul=articul,

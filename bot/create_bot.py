@@ -43,7 +43,3 @@ scheduler.start()
 bot = Bot(token=TOKEN, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
-
-# мертвый товар: https://www.ozon.ru/product/6666666666/?oos_search=false
-
-# нет в наличии: https://www.ozon.ru/product/870151153/?oos_search=false

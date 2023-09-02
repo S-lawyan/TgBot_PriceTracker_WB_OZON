@@ -70,10 +70,7 @@ class Selen:
         # Беру существующий драйвер, либо запускаю новый
         DRIVER = self.drivers_list.get(user_id)
         if DRIVER is None:
-            # options = await self.get_options()
-            # DRIVER = webdriver.Chrome(options=options, service=self.service)
             options = uc.ChromeOptions()
-            # options.add_argument('--headless')
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--disable-blink-features=AutomationControlled")
@@ -86,7 +83,7 @@ class Selen:
         product = {}
         try:
             DRIVER.get(url)
-            # await asyncio.sleep(random.randint(1, 3))
+            await asyncio.sleep(random.randint(1, 2))
         except Exception as e:
             logging.error(f"OZON: Исключение при открытии страницы: {e} --- {url}")
             return None
@@ -165,7 +162,7 @@ class Selen:
         url = f"https://www.ozon.ru/product/{articul}/?oos_search=false"
         try:
             DRIVER.get(url)
-            # await asyncio.sleep(random.randint(1, 3))
+            await asyncio.sleep(random.randint(1, 2))
         except Exception as e:
             logging.error(f"OZON: Исключение при открытии страницы: {e} --- {url}")
             return None
@@ -219,20 +216,6 @@ class Selen:
             price_card = price[0]
             DRIVER.delete_all_cookies()
             return int(price_card)
-        # try:
-        #     price_element = DRIVER.find_element(
-        #         By.CSS_SELECTOR, 'div[data-widget="webPrice"]'
-        #     )
-        #     price = str(price_element.text)
-        #     price = re.sub(r"[^a-zA-Zа-яА-Я0-9\s]+", "", price)
-        #     price = re.findall(r"\d+[^\S\n]*\d*", price)
-        #     price = [re.sub(r"[^\S\n]", "", num) for num in price]
-        #     price_card = price[0]
-        #     DRIVER.delete_all_cookies()
-        #     return int(price_card)
-        # except:
-        #     DRIVER.delete_all_cookies()
-        #     return False
 
     async def ozon_masking(self, DRIVER):
         # жду пока прогрузится контент
@@ -254,7 +237,7 @@ class Selen:
             # Выполняем скролл
             DRIVER.execute_script(f"window.scrollTo(0, {scroll_position});")
             # Задержка перед следующим действием
-            await asyncio.sleep(random.uniform(2, 4))
+            await asyncio.sleep(random.uniform(1, 3))
 
     # ============================================ OZON ====================================================================
     async def wb_search_tovar(self, articul, user_id):
@@ -276,7 +259,7 @@ class Selen:
         product = {}
         try:
             DRIVER.get(url)
-            await asyncio.sleep(random.randint(1, 3))
+            await asyncio.sleep(random.randint(1, 2))
         except Exception as e:
             logging.error(f"WB: Исключение при открытии страницы: {e} --- {url}")
             return None
@@ -355,7 +338,7 @@ class Selen:
             # Выполняем скролл
             DRIVER.execute_script(f"window.scrollTo(0, {scroll_position});")
             # Задержка перед следующим действием
-            await asyncio.sleep(random.uniform(2, 4))
+            await asyncio.sleep(random.uniform(1, 3))
 
     async def wb_check_price(self, articul):
         """
@@ -366,7 +349,7 @@ class Selen:
         url = f"https://www.wildberries.ru/catalog/{articul}/detail.aspx"
         try:
             DRIVER.get(url)
-            await asyncio.sleep(random.randint(1, 3))
+            await asyncio.sleep(random.randint(1, 2))
         except Exception as e:
             logging.error(f"WB: Исключение при открытии страницы: {e} --- {url}")
             return None

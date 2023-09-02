@@ -81,8 +81,6 @@ async def processing_arcicul(message: types.Message, state: FSMContext):
         return
 
     msg = message.text
-    articul = None
-    source = ""
 
     # Обработка АРТИКУЛА -> переход к вопросу об источнике
     if re.match(r"^\d{5,}$", msg):
@@ -170,9 +168,7 @@ async def processing_arcicul(message: types.Message, state: FSMContext):
             await ClientStates.await_react.set()
 
 
-@dp.callback_query_handler(
-    text_contains="#", state=ClientStates.which_store
-)  # text=['wb, ozon']
+@dp.callback_query_handler(text_contains="#", state=ClientStates.which_store)  # text=['wb, ozon']
 async def enter_source(call: types.CallbackQuery, state: FSMContext):
     # Удаление сообщения с кнопками выбора источника
     async with state.proxy() as data:
@@ -406,8 +402,6 @@ async def processing_delete(message: types.Message, state: FSMContext):
                     f"⚠️Такой позиции нет в отслеживаемых (возможно только в указанном магазине): {articul}"
                 )
                 continue
-                # async with state.proxy() as data:
-                #     data['sent_message'] = sent_message
             else:
                 try:
                     await db.dell_position(
