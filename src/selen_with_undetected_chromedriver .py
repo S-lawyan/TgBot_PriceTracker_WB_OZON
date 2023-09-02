@@ -14,6 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
+import undetected_chromedriver as uc
 
 class Selen:
     drivers_list: dict = {}
@@ -27,7 +28,21 @@ class Selen:
         self.service = Service(ChromeDriverManager().install())
         self.user_list = user_list
         self.create_drivers("wb")
-        self.create_drivers("ozon")
+        # self.create_drivers("ozon")
+        self.create_drivers_ozon()
+
+    def create_drivers_ozon(self):
+        options = uc.ChromeOptions()
+        options.add_argument('--headless')
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--disable-gpu")
+        options.add_argument(f"user-agent={UserAgent().random}")
+        DRIVER = uc.Chrome(options=options)
+        actions = ActionChains(DRIVER)
+        self.drivers_list['ozon'] = DRIVER
+        self.actions_list['ozon'] = actions
 
     def create_drivers(self, source: str):
         options = Options()
@@ -55,8 +70,16 @@ class Selen:
         # Беру существующий драйвер, либо запускаю новый
         DRIVER = self.drivers_list.get(user_id)
         if DRIVER is None:
-            options = await self.get_options()
-            DRIVER = webdriver.Chrome(options=options, service=self.service)
+            # options = await self.get_options()
+            # DRIVER = webdriver.Chrome(options=options, service=self.service)
+            options = uc.ChromeOptions()
+            # options.add_argument('--headless')
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--disable-blink-features=AutomationControlled")
+            options.add_argument("--disable-gpu")
+            options.add_argument(f"user-agent={UserAgent().random}")
+            DRIVER = uc.Chrome(options=options)
             self.drivers_list[user_id] = DRIVER
 
         url = f"https://www.ozon.ru/product/{articul}/?oos_search=false"
@@ -75,7 +98,8 @@ class Selen:
                     DRIVER, 20, (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]')
                 )
             )
-        except:
+        except Exception as e:
+            logging.error(f"{e}")
             try:
                 error_404 = WebDriverWait(DRIVER, 20).until(
                     EC.presence_of_element_located(
@@ -87,10 +111,11 @@ class Selen:
                 )
                 await self.clear_driver(DRIVER=DRIVER)
                 return None
-            except:
+            except Exception as e:
                 logging.error(
                     f"ЧТО-ТО СТРАННОЕ OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
                 )
+                logging.error(f"{e}")
                 await self.clear_driver(DRIVER=DRIVER)
                 return None
 
@@ -126,6 +151,7 @@ class Selen:
             price = [re.sub(r"[^\S\n]", "", num) for num in price]
             price_card = price[0]
 
+
         product["price"] = price_card
         await self.clear_driver(DRIVER=DRIVER)
         return product
@@ -151,8 +177,8 @@ class Selen:
                     DRIVER, 20, (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]')
                 )
             )
-        except:
-
+        except Exception as e:
+            logging.error(f'{e}')
             try:
                 error_404 = WebDriverWait(DRIVER, 20).until(
                     EC.presence_of_element_located(
@@ -164,10 +190,11 @@ class Selen:
                 )
                 DRIVER.delete_all_cookies()
                 return None
-            except:
+            except Exception as e:
                 logging.error(
                     f"ЧТО-ТО СТРАННОЕ OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
                 )
+                logging.error(f'{e}')
                 DRIVER.delete_all_cookies()
                 return None
 
