@@ -1,6 +1,6 @@
 .idea
 venv
-log/
+log/ERROR.txt
 src/config.ini
 DB/bot_database.db
 

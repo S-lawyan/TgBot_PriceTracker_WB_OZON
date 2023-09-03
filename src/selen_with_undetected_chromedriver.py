@@ -1,3 +1,5 @@
+# TODO переименовать этот файл в главный селен и сделать так, чтобы озон работал на андетеч, а вб на обычном.
+
 import asyncio
 import logging
 import random
@@ -33,7 +35,7 @@ class Selen:
 
     def create_drivers_ozon(self):
         options = uc.ChromeOptions()
-        options.add_argument('--headless')
+        options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-blink-features=AutomationControlled")
@@ -71,6 +73,7 @@ class Selen:
         DRIVER = self.drivers_list.get(user_id)
         if DRIVER is None:
             options = uc.ChromeOptions()
+            options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--disable-blink-features=AutomationControlled")
@@ -81,40 +84,44 @@ class Selen:
 
         url = f"https://www.ozon.ru/product/{articul}/?oos_search=false"
         product = {}
-        try:
-            DRIVER.get(url)
-            await asyncio.sleep(random.randint(1, 2))
-        except Exception as e:
-            logging.error(f"OZON: Исключение при открытии страницы: {e} --- {url}")
-            return None
 
-        # Ожидание загрузки страницы
-        try:
-            await asyncio.create_task(
-                self.wait_fing_element(
-                    DRIVER, 20, (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]')
-                )
-            )
-        except Exception as e:
-            logging.error(f"{e}")
+        # ПОПРОБУЮ СДЕЛАТЬ ПОВТОРНОЕ ОТКРЫТИЕ, ЕСЛИ НЕ ПОЛУЧАЕТСЯ С ПЕРВОГО РАЗА
+        for i in range(3):
             try:
-                error_404 = WebDriverWait(DRIVER, 20).until(
-                    EC.presence_of_element_located(
-                        (By.XPATH, '//div[@data-widget="error"]')
+                DRIVER.get(url)
+                await asyncio.sleep(random.randint(1, 2))
+            except Exception as e:
+                logging.error(f"OZON: Исключение при открытии страницы: {e} --- {url}")
+                continue
+
+            # Ожидание загрузки страницы
+            try:
+                await asyncio.create_task(
+                    self.wait_fing_element(
+                        DRIVER, 20, (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]')
                     )
                 )
-                logging.error(
-                    f"OZON: Ошибка при ожидании (stickyContainer) артикула {articul}. Он отсутствует на сайте."
-                )
-                await self.clear_driver(DRIVER=DRIVER)
-                return None
+                break
             except Exception as e:
-                logging.error(
-                    f"ЧТО-ТО СТРАННОЕ OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
-                )
                 logging.error(f"{e}")
-                await self.clear_driver(DRIVER=DRIVER)
-                return None
+                try:
+                    error_404 = WebDriverWait(DRIVER, 20).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, '//div[@data-widget="error"]')
+                        )
+                    )
+                    logging.error(
+                        f"OZON: Ошибка при ожидании (stickyContainer) артикула {articul}. Он отсутствует на сайте."
+                    )
+                    await self.clear_driver(DRIVER=DRIVER)
+                    return None
+                except Exception as e:
+                    # Это исключение срабатывает скорее всего из-за открытия страницы с капчей
+                    logging.error(
+                        f"ЧТО-ТО СТРАННОЕ OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
+                    )
+                    logging.error(f"{e}")
+                    continue
 
         # НАИМЕНОВАНИЕ ТОВАРА
         name_element = DRIVER.find_element(
@@ -160,40 +167,47 @@ class Selen:
         """
         DRIVER = self.drivers_list.get("ozon")
         url = f"https://www.ozon.ru/product/{articul}/?oos_search=false"
-        try:
-            DRIVER.get(url)
-            await asyncio.sleep(random.randint(1, 2))
-        except Exception as e:
-            logging.error(f"OZON: Исключение при открытии страницы: {e} --- {url}")
-            return None
 
-        # Ожидание загрузки страницы
-        try:
-            await asyncio.create_task(
-                self.wait_fing_element(
-                    DRIVER, 20, (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]')
-                )
-            )
-        except Exception as e:
-            logging.error(f'{e}')
+        # ПОПРОБУЮ СДЕЛАТЬ ВЫПОЛНЕНИЕ 3 РАЗА
+        for i in range(3):
             try:
-                error_404 = WebDriverWait(DRIVER, 20).until(
-                    EC.presence_of_element_located(
-                        (By.XPATH, '//div[@data-widget="error"]')
+                DRIVER.get(url)
+                await asyncio.sleep(random.randint(1, 2))
+            except Exception as e:
+                logging.error(f"OZON: Исключение при открытии страницы: {e} --- {url}")
+                continue
+                # return None
+
+            # Ожидание загрузки страницы
+            try:
+                await asyncio.create_task(
+                    self.wait_fing_element(
+                        DRIVER, 20, (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]')
                     )
                 )
-                logging.error(
-                    f"OZON: Ошибка при ожидании (stickyContainer) артикула {articul}. Он отсутствует на сайте."
-                )
-                DRIVER.delete_all_cookies()
-                return None
+                break
             except Exception as e:
-                logging.error(
-                    f"ЧТО-ТО СТРАННОЕ OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
-                )
                 logging.error(f'{e}')
-                DRIVER.delete_all_cookies()
-                return None
+                try:
+                    error_404 = WebDriverWait(DRIVER, 20).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, '//div[@data-widget="error"]')
+                        )
+                    )
+                    logging.error(
+                        f"OZON: Ошибка при ожидании (stickyContainer) артикула {articul}. Он отсутствует на сайте."
+                    )
+                    DRIVER.delete_all_cookies()
+                    return None
+                except Exception as e:
+                    # Это исключение срабатывает скорее всего из-за открытия страницы с капчей
+                    logging.error(
+                        f"ЧТО-ТО СТРАННОЕ OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
+                    )
+                    logging.error(f'{e}')
+                    DRIVER.delete_all_cookies()
+                    continue
+                    # return None
 
         # ========== МАСКИРОВКА ===============
         await self.ozon_masking(DRIVER)
