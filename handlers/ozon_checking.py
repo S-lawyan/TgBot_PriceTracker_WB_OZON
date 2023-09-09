@@ -43,6 +43,11 @@ async def ozon_price_checking() -> None:
                 continue
             logging.error(f"Начата проверка цен OZON для пользователя {user_id}")
             for position in positions_list:
+
+
+
+
+
                 articul = position[0]
                 name = position[1]
                 if position[2] != "Нет в наличии":
@@ -63,7 +68,7 @@ async def ozon_price_checking() -> None:
                         await bot.send_photo(
                             user_id,
                             photo=img,
-                            caption=f'⚡⚡⚡ <b>Товар появился в наличии</b>\nOZON 🔵\n{name}\n<b>Артикул:</b> {articul}\n<b>Цена:</b> {price_new} ₽\n<a href="https://www.ozon.ru/product/{articul}/detail.aspx">ССЫЛКА</a>',
+                            caption=f'⚡⚡⚡ <b>Товар появился в наличии</b>\nOZON 🔵\n{name}\n<b>Артикул:</b> {articul}\n<b>Цена:</b> {price_new} ₽\n<a href="https://www.ozon.ru/product/{articul}/?oos_search=false">ССЫЛКА</a>',
                         )
                         await db.update_price(
                             articul=articul,
@@ -79,7 +84,7 @@ async def ozon_price_checking() -> None:
                         await bot.send_photo(
                             user_id,
                             photo=img,
-                            caption=f'⚡⚡ <b>Товара больше нет в наличии</b>\nOZON 🔵\n{name}\n<b>Артикул:</b> {articul}\n<a href="https://www.ozon.ru/product/{articul}/detail.aspx">ССЫЛКА</a>',
+                            caption=f'⚡⚡ <b>Товара больше нет в наличии</b>\nOZON 🔵\n{name}\n<b>Артикул:</b> {articul}\n<a href="https://www.ozon.ru/product/{articul}/?oos_search=false">ССЫЛКА</a>',
                         )
                         price_new = "Нет в наличии"
                         await db.update_price(
@@ -97,7 +102,7 @@ async def ozon_price_checking() -> None:
                         await bot.send_photo(
                             user_id,
                             photo=img,
-                            caption=f'⚡⚡⚡ <b>Цена снижена</b>\nOZON 🔵\n{name}\n<b>Артикул:</b> {articul}\n<b>Старая цена:</b> {price_old} ₽\n<b>Новая цена:</b> {price_new} ₽\n<a href="https://www.ozon.ru/product/{articul}/detail.aspx">ССЫЛКА</a>\n\n<b>Подешевело на: {difference} ₽</b>',
+                            caption=f'⚡⚡⚡ <b>Цена снижена</b>\nOZON 🔵\n{name}\n<b>Артикул:</b> {articul}\n<b>Старая цена:</b> {price_old} ₽\n<b>Новая цена:</b> {price_new} ₽\n<a href="https://www.ozon.ru/product/{articul}/?oos_search=false">ССЫЛКА</a>\n\n<b>Подешевело на: {difference} ₽</b>',
                         )
                         await db.update_price(
                             articul=articul,
@@ -114,7 +119,7 @@ async def ozon_price_checking() -> None:
                         await bot.send_photo(
                             user_id,
                             photo=img,
-                            caption=f'⚡ <b>Цена возросла</b>\nOZON 🔵\n{name}\n<b>Артикул:</b> {articul}\n<b>Старая цена:</b> {price_old} ₽\n<b>Новая цена:</b> {price_new} ₽\n<a href="https://www.ozon.ru/product/{articul}/detail.aspx">ССЫЛКА</a>\n\n<b>Подорожало на: {difference} ₽</b>',
+                            caption=f'⚡ <b>Цена возросла</b>\nOZON 🔵\n{name}\n<b>Артикул:</b> {articul}\n<b>Старая цена:</b> {price_old} ₽\n<b>Новая цена:</b> {price_new} ₽\n<a href="https://www.ozon.ru/product/{articul}/?oos_search=false">ССЫЛКА</a>\n\n<b>Подорожало на: {difference} ₽</b>',
                         )
                         await db.update_price(
                             articul=articul,
@@ -135,6 +140,12 @@ async def ozon_price_checking() -> None:
                         f"⚠️ Товар с артикулом {articul} (OZON) исчез с сайта. Проверьте его валидность.",
                     )
                     continue
+
+
+
+
+
+
 
             await bot.send_message(
                 514665692,

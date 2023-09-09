@@ -55,6 +55,10 @@ async def click_password(call: types.CallbackQuery, state: FSMContext):
     await sent_message.edit_text("Давай знакомиться!\nВведи пароль")
     await ClientStates.get_passwd.set()
 
+@dp.message_handler(commands=["/reset"])
+async def reset_db(message: types.Message, state: FSMContext):
+    await db.reset_db()
+    await message.answer("Все цены приравнены к 777!")
 
 # ================    ПРИНИМАЕМ ПАРОЛЬ И ПРОВЕРЯЕМ ЕГО   =========================
 @dp.message_handler(content_types=types.ContentType.TEXT, state=ClientStates.get_passwd)
@@ -320,7 +324,7 @@ async def my_positions(message: types.Message, state: FSMContext):
                     if str(item[2]) != "Нет в наличии"
                     else str(item[2])
                 )
-                msg += f'🔰  {item[0]}\n<b>Название:</b> {item[1]}\n<b>Цена:</b> {price}\n<a href="https://www.ozon.ru/product/{item[0]}">ССЫЛКА</a>\n'
+                msg += f'🔰  {item[0]}\n<b>Название:</b> {item[1]}\n<b>Цена:</b> {price}\n<a href="https://www.ozon.ru/product/{item[0]}/?oos_search=false">ССЫЛКА</a>\n'
                 msg += "\n"
                 count += 1
                 if count == 20:
