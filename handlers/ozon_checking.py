@@ -33,6 +33,7 @@ async def ozon_price_checking() -> None:
     """
     try:
         scheduler.remove_job("ozon_price_checking")
+        # selen.create_drivers(source='ozon')
         users_list = await db.get_all_users()
         if len(users_list) == 0:
             return
@@ -43,11 +44,6 @@ async def ozon_price_checking() -> None:
                 continue
             logging.error(f"Начата проверка цен OZON для пользователя {user_id}")
             for position in positions_list:
-
-
-
-
-
                 articul = position[0]
                 name = position[1]
                 if position[2] != "Нет в наличии":
@@ -55,6 +51,8 @@ async def ozon_price_checking() -> None:
                 else:
                     price_old = False
                 img = position[3]
+
+                logging.error(f"НАЧАТА Обработка товара с артикулом {articul}")
 
                 # Получение новых данных
                 price_new = await selen.ozon_check_price(articul)
@@ -141,12 +139,7 @@ async def ozon_price_checking() -> None:
                     )
                     continue
 
-
-
-
-
-
-
+            # selen.close_drivers(source='ozon')
             await bot.send_message(
                 514665692,
                 f"Для пользователя {user_id} проверено {counter} позиций OZON",
@@ -166,12 +159,12 @@ async def ozon_price_checking() -> None:
 
 async def ozon_add_price_checking_job():
     """
-    Запуск проверки цен каждый 30 минут (в плане - 60 минут)
+    Запуск проверки цен каждые 30 минут (в плане - 60 минут)
     """
     scheduler.add_job(
         ozon_price_checking,
         trigger="interval",
-        seconds=random.randint(1, 5),
+        minutes=random.randint(1, 5),
         id="ozon_price_checking",
     )
 
@@ -179,7 +172,7 @@ async def ozon_add_price_checking_job():
 scheduler.add_job(
     ozon_add_price_checking_job,
     trigger="date",
-    run_date=datetime.now() + timedelta(seconds=5),
+    run_date=datetime.now() + timedelta(seconds=10),
     id="ozon_price_checking",
 )
 

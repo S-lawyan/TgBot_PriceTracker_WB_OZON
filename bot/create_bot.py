@@ -11,13 +11,13 @@ from DB.db_sqlite import DataBase
 from src.selen import Selen
 
 # логируем ошибки
-# logging.basicConfig(
-#     filename="log/ERROR.txt",
-#     filemode="a",
-#     format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
-#     datefmt="%Y-%m-%d %H:%M:%S",
-#     level=logging.ERROR,
-# )
+logging.basicConfig(
+    filename="log/ERROR.txt",
+    filemode="a",
+    format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.ERROR,
+)
 
 # берем конфиги
 config = configparser.ConfigParser()
@@ -42,4 +42,3 @@ scheduler.start()
 # запускаем бота
 bot = Bot(token=TOKEN, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=MemoryStorage())
-

@@ -1,11 +1,11 @@
 # TODO переименовать этот файл в главный селен и сделать так, чтобы озон работал на андетеч, а вб на обычном.
-
 import asyncio
 import logging
 import random
 import re
 
 import aiohttp
+import undetected_chromedriver as uc
 from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -16,7 +16,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
-import undetected_chromedriver as uc
 
 class Selen:
     drivers_list: dict = {}
@@ -43,8 +42,8 @@ class Selen:
         options.add_argument(f"user-agent={UserAgent().random}")
         DRIVER = uc.Chrome(options=options)
         actions = ActionChains(DRIVER)
-        self.drivers_list['ozon'] = DRIVER
-        self.actions_list['ozon'] = actions
+        self.drivers_list["ozon"] = DRIVER
+        self.actions_list["ozon"] = actions
 
     def create_drivers(self, source: str):
         options = Options()
@@ -98,7 +97,9 @@ class Selen:
             try:
                 await asyncio.create_task(
                     self.wait_fing_element(
-                        DRIVER, 20, (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]')
+                        DRIVER,
+                        20,
+                        (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]'),
                     )
                 )
                 break
@@ -155,7 +156,6 @@ class Selen:
             price = [re.sub(r"[^\S\n]", "", num) for num in price]
             price_card = price[0]
 
-
         product["price"] = price_card
         await self.clear_driver(DRIVER=DRIVER)
         return product
@@ -182,12 +182,14 @@ class Selen:
             try:
                 await asyncio.create_task(
                     self.wait_fing_element(
-                        DRIVER, 20, (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]')
+                        DRIVER,
+                        20,
+                        (By.CSS_SELECTOR, 'div[data-widget="stickyContainer"]'),
                     )
                 )
                 break
             except Exception as e:
-                logging.error(f'{e}')
+                logging.error(f"{e}")
                 try:
                     error_404 = WebDriverWait(DRIVER, 20).until(
                         EC.presence_of_element_located(
@@ -204,7 +206,7 @@ class Selen:
                     logging.error(
                         f"ЧТО-ТО СТРАННОЕ OZON: Ошибка при ожидании (div[@data-widget='error']) артикула {articul}"
                     )
-                    logging.error(f'{e}')
+                    logging.error(f"{e}")
                     DRIVER.delete_all_cookies()
                     continue
                     # return None

@@ -43,7 +43,7 @@ async def command_start(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(commands=["/reset"])
-async def reset_db(message: types.Message, state: FSMContext):
+async def call_reset_db(message: types.Message, state: FSMContext):
     await db.reset_db()
     await message.answer("Все цены приравнены к 777!")
 
@@ -55,10 +55,12 @@ async def click_password(call: types.CallbackQuery, state: FSMContext):
     await sent_message.edit_text("Давай знакомиться!\nВведи пароль")
     await ClientStates.get_passwd.set()
 
+
 @dp.message_handler(commands=["/reset"])
 async def reset_db(message: types.Message, state: FSMContext):
     await db.reset_db()
     await message.answer("Все цены приравнены к 777!")
+
 
 # ================    ПРИНИМАЕМ ПАРОЛЬ И ПРОВЕРЯЕМ ЕГО   =========================
 @dp.message_handler(content_types=types.ContentType.TEXT, state=ClientStates.get_passwd)
@@ -172,7 +174,7 @@ async def processing_arcicul(message: types.Message, state: FSMContext):
             await ClientStates.await_react.set()
 
 
-@dp.callback_query_handler(text_contains="#", state=ClientStates.which_store)  # text=['wb, ozon']
+@dp.callback_query_handler(text_contains="#", state=ClientStates.which_store)
 async def enter_source(call: types.CallbackQuery, state: FSMContext):
     # Удаление сообщения с кнопками выбора источника
     async with state.proxy() as data:

@@ -159,7 +159,7 @@ async def wb_add_price_checking_job():
     scheduler.add_job(
         wb_price_checking,
         trigger="interval",
-        seconds=random.randint(1, 5),
+        minutes=random.randint(1, 5),
         id="wb_price_checking",
     )
 
@@ -167,7 +167,7 @@ async def wb_add_price_checking_job():
 scheduler.add_job(
     wb_add_price_checking_job,
     trigger="date",
-    run_date=datetime.now() + timedelta(seconds=5),
+    run_date=datetime.now() + timedelta(seconds=15),
     id="wb_price_checking",
 )
 
